@@ -9,26 +9,20 @@ class StockTickerFinder:
         self.company_df = None
 
     def load_company_data(self, file_path):
-        # Load company data from a xlsx file
         self.company_df = pd.read_excel(file_path)
         
     def find_most_similar_company(self, query):
         if self.company_df is None:
             raise ValueError("Company data has not been loaded.")
         
-        # Combine query with company names for vectorization
         combined_texts = [query] + self.company_df['Name'].tolist()
         
-        # Fit and transform the combined texts using TF-IDF vectorizer
         tfidf_matrix = self.vectorizer.fit_transform(combined_texts)
         
-        # Calculate cosine similarity between the query and company names
         cosine_similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
         
-        # Find the index of the most similar company
         most_similar_idx = cosine_similarities.argmax()
         
-        # Get the ticker and company name of the most similar company
         most_similar_company = self.company_df.iloc[most_similar_idx]['Name']
         most_similar_ticker = self.company_df.iloc[most_similar_idx]['Ticker']
         return most_similar_company, most_similar_ticker
